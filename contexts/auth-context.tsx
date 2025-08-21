@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 })
 
                 return () => subscription.unsubscribe()
-            } catch {
+            } catch (error){
                 console.error(error)
             } finally {
                 setLoading(false)
@@ -44,10 +44,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         checkUser()
-    })
+    }, [])
 
     async function signOut() {
-
+        try {
+            await supabase.auth.signOut()
+        } catch (error) {
+            console.error("A problem has occured while signing out", error)
+        }
     }
 
     return (
