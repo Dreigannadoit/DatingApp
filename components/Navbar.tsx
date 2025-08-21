@@ -10,7 +10,7 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-16">
                     <Link href="/" className="flex items-center space-x-3">
                         <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-200 bg-clip-text text-transparent">
-                            StreamMatch
+                            Tadhana
                         </span>
                     </Link>
 
@@ -47,7 +47,7 @@ export default function Navbar() {
                     {user ? (
                         <button
                             onClick={signOut}
-                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-medium rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-sm font-medium rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg"
                         >
                             <svg
                                 className="w-4 h-4 mr-1"
