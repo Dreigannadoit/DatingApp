@@ -142,7 +142,7 @@ const ProfilePage = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-6">
+                                <div className="space-y-6 mt-5">
                                     <div>
                                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
                                             About Me
