@@ -1,9 +1,40 @@
 "use client";
+import { UserProfile } from "@/app/profile/page";
 import { useAuth } from "@/contexts/auth-context";
+import { getCurrentUserProfile } from "@/lib/actions/profile";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
+
+    const [profile, setProfile] = useState<UserProfile | null>(null)
     const { signOut, user } = useAuth();
+    const [error, setError] = useState<string | null>(null)
+    const [loading, setLoading] = useState<boolean>(true)
+
+    useEffect(() => {
+        async function loadProfile() {
+            try {
+                const profileData = await getCurrentUserProfile()
+
+                console.log(profileData)
+
+                if (profileData) {
+                    setProfile(profileData)
+                } else {
+                    setError("Failed to load profile. ")
+                }
+            } catch (err) {
+                console.error("Error loading profile: ", err)
+                setError("Failed to load Profile")
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadProfile()
+    }, [])
+
     return (
         <nav className="relative z-50 bg-slate-900 border-b border-gray-200/50 dark:border-gray-700/50">
             <div className="container mx-auto px-6">
@@ -45,25 +76,37 @@ export default function Navbar() {
                     )}
 
                     {user ? (
-                        <button
-                            onClick={signOut}
-                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-sm font-medium rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                        >
-                            <svg
-                                className="w-4 h-4 mr-1"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
+                        <div className="flex gap-2">
+                            <button
+                                onClick={signOut}
+                                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-sm font-medium rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-md hover:shadow-lg"
                             >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                                />
-                            </svg>
-                            Sign Out
-                        </button>
+                                <svg
+                                    className="w-4 h-4 mr-1"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                    />
+                                </svg>
+                                Sign Out
+                            </button>
+
+                            {profile && (
+                                <div className="w-10 h-10 rounded-full overflow-hidden ">
+                                    <img
+                                        src={profile.avatar_url || "/avtr_def.png"}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            )}
+                        </div>
                     ) : (
                         <Link
                             href="/auth"
