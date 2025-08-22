@@ -61,6 +61,18 @@ export default function MatchesPage() {
 
   function handleStartChat() { }
 
+  if (loading) {
+    return (
+      <div className="h-full bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Finding your matches...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (currentIndex >= potentialMatches.length) {
     return (
@@ -89,19 +101,6 @@ export default function MatchesPage() {
             onStartChat={handleStartChat}
           />
         )}
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="h-full bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Finding your matches...
-          </p>
-        </div>
       </div>
     );
   }
