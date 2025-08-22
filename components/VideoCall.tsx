@@ -1,3 +1,4 @@
+// VideoCall.tsx
 import React, { useEffect, useState } from 'react'
 import {
     Call,
@@ -9,40 +10,33 @@ import {
     StreamVideoClient,
 } from "@stream-io/video-react-sdk";
 import "@stream-io/video-react-sdk/dist/css/styles.css";
-import { UserProfile } from '@/app/profile/page';
 import { getStreamVideoToken } from '@/lib/actions/stream';
 
 interface VideoCallProps {
     callId: string;
     onCallEnd: () => void;
     isIncoming?: boolean;
-    // otherUser: UserProfile;
 }
 
-
-const VideoCall = ({ 
-  callId,
-  onCallEnd,
-  isIncoming = false
+const VideoCall = ({
+    callId,
+    onCallEnd,
+    isIncoming = false
 }: VideoCallProps) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null)
     const [client, setClient] = useState<StreamVideoClient | null>(null);
     const [call, setCall] = useState<Call | null>(null)
-    const [hasJoined, setHasJoined] = useState(false);
 
     useEffect(() => {
-        let isMounted = true
-        
-        async function intializeVideoCall() {
-            if (hasJoined) {
-                return
-            }
-            try {
-                setError(null)
-                const { token, userId, userName, userImage } = await getStreamVideoToken()
+        let isMounted = true;
 
-                if(!isMounted) return;
+        async function initializeVideoCall() {
+            try {
+                setError(null);
+                const { token, userId, userName, userImage } = await getStreamVideoToken();
+
+                if (!isMounted) return;
 
                 const videoClient = new StreamVideoClient({
                     apiKey: process.env.NEXT_PUBLIC_STREAM_API_KEY!,
@@ -52,38 +46,52 @@ const VideoCall = ({
                         image: userImage!
                     },
                     token,
-                })
+                });
 
-                if(!isMounted) return;
+                if (!isMounted) return;
 
-                const videoCall = videoClient.call("default", callId)
+                const videoCall = videoClient.call("default", callId);
 
-                if (isIncoming) await videoCall.join()
-                else await videoCall.join({ create: true })
+                // Join the call
+                await videoCall.join({ create: true });
 
-                if(!isMounted) return;
+                if (!isMounted) return;
 
-                setClient(videoClient)
-                setCall(videoCall)
-                setHasJoined(true)
+                setClient(videoClient);
+                setCall(videoCall);
 
             } catch (error) {
-                console.error(error)
-                setError("Failed to initiate call")
+                console.error("Video call error:", error);
+                setError("Failed to initiate call");
             } finally {
-                setLoading(false)
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         }
 
-
-        intializeVideoCall()
+        initializeVideoCall();
 
         return () => {
-            let isMounted = false
-            if (call && hasJoined) call.leave()
-            if (client) client.disconnectUser()
+            isMounted = false;
+            if (call) {
+                call.leave().catch(console.error);
+            }
+            if (client) {
+                client.disconnectUser();
+            }
+        };
+    }, [callId]);
+
+    const handleCallEnd = () => {
+        if (call) {
+            call.leave().catch(console.error);
         }
-    }, [callId, isIncoming, hasJoined])
+        if (client) {
+            client.disconnectUser();
+        }
+        onCallEnd();
+    };
 
     if (loading) {
         return (
@@ -108,7 +116,7 @@ const VideoCall = ({
                     <h3 className="text-xl font-semibold mb-2">Call Error</h3>
                     <p className="text-gray-300 mb-4">{error}</p>
                     <button
-                        onClick={onCallEnd}
+                        onClick={handleCallEnd}
                         className="bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold py-3 px-6 rounded-full hover:from-pink-600 hover:to-red-600 transition-all duration-200"
                     >
                         Close
@@ -119,28 +127,25 @@ const VideoCall = ({
     }
 
     if (!client || !call) {
-        return (
-            <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-                <div className="text-center text-white">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-                    <p className="text-lg">Setting up call...</p>
-                </div>
-            </div>
-        );
+        return null;
     }
 
     return (
-        <div className="fixed insert-0 bg-black z-50">
+        <div className="fixed inset-0 bg-black z-50">
             <StreamVideo client={client}>
                 <StreamCall call={call}>
                     <StreamTheme>
-                        <SpeakerLayout/>
-                        <CallControls onLeave={onCallEnd}/>
+                        <div className="h-screen w-screen">
+                            <SpeakerLayout />
+                            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                                <CallControls onLeave={handleCallEnd} />
+                            </div>
+                        </div>
                     </StreamTheme>
                 </StreamCall>
             </StreamVideo>
         </div>
-    )
+    );
 }
 
-export default VideoCall
+export default VideoCall;

@@ -65,6 +65,13 @@ const StreamChatInterface = ({ otherUser, ref }: { otherUser: UserProfile; ref: 
     }, [handleScroll])
 
     useEffect(() => {
+        setShoeVideoCall(false);
+        setVideoCallId("");
+        setIncomingCall(false);
+        setIncomingCallId("");
+        setCallerName("");
+        setIsCallInitiator(false);
+
         async function initiailzeChat() {
             try {
                 setError(null)
@@ -109,12 +116,12 @@ const StreamChatInterface = ({ otherUser, ref }: { otherUser: UserProfile; ref: 
                     if (event.message) {
 
                         if (event.message.text?.includes(`Video Call Invitation`)) {
-                            const customData = event.message as any;
+                            const customData = event.message as any
 
                             if (customData.caller_id !== userId) {
-                                setIncomingCallId(customData.call_id);
-                                setCallerName(customData.caller_name || "Someone");
-                                setIncomingCall(true);
+                                setIncomingCallId(customData.call_Id)
+                                setCallerName(customData.caller_name || "Someone")
+                                setIncomingCall(true)
                             }
 
                             return;
@@ -180,7 +187,7 @@ const StreamChatInterface = ({ otherUser, ref }: { otherUser: UserProfile; ref: 
             if (channel) {
                 const messageData = {
                     text: `Video Call Invitation`,
-                    callId,
+                    call_Id: callId,
                     caller_id: currentUserId,
                     caller_name: otherUser.full_name || "Someone"
                 };
@@ -190,6 +197,16 @@ const StreamChatInterface = ({ otherUser, ref }: { otherUser: UserProfile; ref: 
         } catch (error) {
             console.error(error);
         }
+    }
+
+    const handleCallEnd = () => {
+        setShoeVideoCall(false)
+        setVideoCallId("")
+        setIsCallInitiator(false);
+
+        setIncomingCall(false)
+        setIncomingCallId("")
+        setCallerName("")
     }
 
     const handleDeclineCall = () => {
@@ -350,6 +367,10 @@ const StreamChatInterface = ({ otherUser, ref }: { otherUser: UserProfile; ref: 
                         value={newMessage}
                         onChange={(e) => {
                             setNewMessage(e.target.value)
+                            if (channel && e.target.value.length > 0) channel.keystroke()
+                        }}
+                        onFocus={(e) => {
+                            if (channel) channel.keystroke()
                         }}
                         placeholder="Type a message..."
                         className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
@@ -419,9 +440,9 @@ const StreamChatInterface = ({ otherUser, ref }: { otherUser: UserProfile; ref: 
 
             {showVideoCall && videoCallId && (
                 <VideoCall
-                    onCallEnd={() => console.log("CALL END")}
+                    onCallEnd={handleCallEnd}
                     callId={videoCallId}
-                    isIncoming={isCallInitiator}
+                    isIncoming={!isCallInitiator}
                 />
             )}
         </div>
