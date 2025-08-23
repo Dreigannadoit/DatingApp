@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { UserProfile } from '../profile/page'
 import { getUserMatches } from '@/lib/actions/matches';
 import Link from 'next/link';
+import LoadingState from '@/components/LoadingState';
 
 interface ChatData {
     id: string;
@@ -62,14 +63,7 @@ const ChatPage = () => {
 
     if (loading) {
         return (
-            <div className="h-full bg-gradient-to-br from-pink-50 to-red-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500 mx-auto"></div>
-                    <p className="mt-4 text-gray-600 dark:text-gray-400">
-                        Loading Chats
-                    </p>
-                </div>
-            </div>
+            <LoadingState data={"Loading your carts..."}/>
         );
     }
 

@@ -11,6 +11,7 @@ import {
 } from "@stream-io/video-react-sdk";
 import "@stream-io/video-react-sdk/dist/css/styles.css";
 import { getStreamVideoToken } from '@/lib/actions/stream';
+import LoadingState from './LoadingState';
 
 interface VideoCallProps {
     callId: string;
@@ -95,14 +96,7 @@ const VideoCall = ({
 
     if (loading) {
         return (
-            <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-                <div className="text-center text-white">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-                    <p className="text-lg">
-                        {isIncoming ? "Joining call..." : "Starting call..."}
-                    </p>
-                </div>
-            </div>
+            <LoadingState data={"Loading your Cideo Call..."}/>
         );
     }
 
