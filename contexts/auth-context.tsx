@@ -1,6 +1,7 @@
 "use client";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 // import { error } from "node:console";
 import { Children, createContext, useContext, useEffect, useRef, useState } from "react";
 
@@ -8,25 +9,27 @@ interface AuthContextType {
     user: User | null
     loading: boolean
     signOut: () => Promise<void>
-  resetTimeout: () => void
+    resetTimeout: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+    const router = useRouter()
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
     const supabase = createClient();
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const TIMEOUT_MS = 60 * 60 * 1000;
-
+    const timeoutDutationMinutes = 60
+    const TIMEOUT_MS = timeoutDutationMinutes * 60 * 1000; 
 
     const resetTimeout = () => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
         timeoutRef.current = setTimeout(async () => {
             console.log("Session expired due to inactivity");
+
             await signOut();
         }, TIMEOUT_MS);
     };
@@ -36,9 +39,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             try {
                 const {
                     data: { session },
-                } = await supabase.auth.getSession();
+                } = await supabase.auth.getSession()
 
-                setUser(session?.user ?? null);
+                setUser(session?.user ?? null)
 
                 // listen to auth changes
                 const {
@@ -47,13 +50,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     setUser(session?.user ?? null);
 
                     if (session?.user) {
-                        resetTimeout(); // start timeout on login
+                        resetTimeout();
                     } else {
-                        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+                        if (timeoutRef.current) clearTimeout(timeoutRef.current)
                     }
                 });
 
-                return () => subscription.unsubscribe();
+                return () => {
+                    subscription.unsubscribe()
+                }
             } catch (error) {
                 console.error(error);
             } finally {
@@ -82,7 +87,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     async function signOut() {
         try {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);router.push("/")
             await supabase.auth.signOut()
         } catch (error) {
             console.error("A problem has occured while signing out", error)

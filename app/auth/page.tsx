@@ -19,7 +19,7 @@ const AuthPage = () => {
 
     useEffect(() => {
         if(user && !authLoading) {
-            router.push("/")
+            router.push("/profile")
         }
     }, [user, authLoading, router ])
 
