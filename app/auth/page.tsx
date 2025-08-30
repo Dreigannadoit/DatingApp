@@ -58,9 +58,8 @@ const AuthPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 to-red-100 dark:from-gray-900 dark:to-gray-800">
-            <div className="max-w-md w-full space-y-8 p-8">
-
+        <div className="min-h-screen bg-gradient-to-br from-pink-100 to-red-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="max-w-md w-1/2 absolute top-1/2 left-1/5 translate-y-[-50%]  space-y-8 p-8 bg-w">
                 <div className="text-center">
                     <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
                         Tadhana
@@ -70,6 +69,7 @@ const AuthPage = () => {
                     </p>
                 </div>
 
+               
                 <form className="space-y-6" onSubmit={handleAuth}>
                     <div>
                         <label
@@ -132,7 +132,10 @@ const AuthPage = () => {
                             : "Don't have an account? Sign up"}
                     </button>
                 </div>
+            </div>
 
+            <div className='h-full w-1/2 absolute right-0 space-y-8 p-8 bg-w'>
+                <img className="h-full w-full object-cover" src="SignUp.jpg" alt="" />
             </div>
         </div>
     )
