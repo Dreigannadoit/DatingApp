@@ -69,7 +69,7 @@ const AuthPage = () => {
                     </p>
                 </div>
 
-
+               
                 <form className="space-y-6" onSubmit={handleAuth}>
                     <div>
                         <label
